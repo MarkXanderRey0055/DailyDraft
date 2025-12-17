@@ -11,7 +11,7 @@ const Header = ({ name }) => {
         
         <div className="flex items-center gap-4">
           <button className="hidden sm:flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 rounded-full transition-colors duration-200 font-semibold text-white shadow-md">
-            MR
+            XR
           </button>
           <div className="sm:hidden flex items-center justify-center w-9 h-9 bg-green-500 hover:bg-green-600 rounded-full transition-colors duration-200 font-semibold text-white text-sm shadow-md">
             M

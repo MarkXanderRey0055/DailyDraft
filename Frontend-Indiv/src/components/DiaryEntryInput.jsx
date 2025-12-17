@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Calendar, User, Clock, Sparkles } from "lucide-react";
+import { Save, Calendar, User, Clock, Trash2 } from "lucide-react";
 
 function DiaryEntryInput({ onEntrySaved }) {
   const [name, setName] = useState("");
@@ -25,6 +25,19 @@ function DiaryEntryInput({ onEntrySaved }) {
       return { success: true };
     } catch (error) {
       return { success: false, message: "Failed to save entry" };
+    }
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this entry?")) {
+      const existingEntries = getEntriesFromStorage();
+      const updatedEntries = existingEntries.filter((entry) => entry.id !== id);
+      localStorage.setItem("diaryEntries", JSON.stringify(updatedEntries));
+      setEntries(updatedEntries); 
+      
+      if (onEntrySaved) {
+        onEntrySaved(); 
+      }
     }
   };
 
@@ -104,33 +117,28 @@ function DiaryEntryInput({ onEntrySaved }) {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-      <div className="mb-12 text-center ">
+      <div className="mb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
           Daily Draft
         </h1>
       </div>
-
-      <div className="flex justify-center ">
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 md:p-8">
+      {/* main input container */}
+      <div className="flex justify-center">
+        <div className="lg:col-span-2 space-y-8 w-full max-w-4xl">
+          <div className="bg-[#FCF9EA] rounded-2xl border border-gray-200 shadow-lg p-6 md:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">New Entry</h2>
-                <p className="text-gray-500 mt-2">
-                  Today's thoughts and reflections
-                </p>
+                <p className="text-gray-500 mt-2">Today's thoughts...</p>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-full">
                 <Clock size={16} className="text-gray-500" />
                 <span className="text-sm text-gray-600 font-medium">
-                  {new Date().toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
             </div>
-           
+
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-3">
@@ -158,130 +166,79 @@ function DiaryEntryInput({ onEntrySaved }) {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
                     maxLength={50}
-                    className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white placeholder-gray-400"
+                    className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Today's Thoughts
-                </label>
+                <label className="block text-sm font-semibold text-gray-700">Today's Thoughts</label>
                 <div className="relative">
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     rows={12}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white resize-none placeholder-gray-400 leading-relaxed"
+                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white resize-none leading-relaxed"
                     required
                   />
-                  <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                    <div
-                      className={`text-sm font-semibold bg-gradient-to-r ${getCharCountColor()} bg-clip-text text-transparent`}
-                    >
+                  <div className="absolute bottom-4 right-4">
+                    <div className={`text-sm font-semibold bg-gradient-to-r ${getCharCountColor()} bg-clip-text text-transparent`}>
                       {text.length}/2000
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={
-                    !date || !name.trim() || !text.trim() || isSubmitting
-                  }
-                  className="w-full group relative overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-4 px-4 rounded-xl font-semibold hover:shadow-xl hover:shadow-indigo-500/30 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.99]"
-                >
-                  <div className="relative z-10 flex items-center justify-center gap-3">
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Saving Entry...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save size={20} />
-                        <span className="text-lg">Save Entry</span>
-                      </>
-                    )}
-                  </div>
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                </button>
-              </div>
+              {/* submit button */}
+              <button
+                type="submit"
+                disabled={!date || !name.trim() || !text.trim() || isSubmitting}
+                className="w-full bg-[#B8DB80] text-white py-4 px-4 rounded-xl font-semibold hover:shadow-xl disabled:from-gray-300 transition-all duration-300"
+              >
+                {isSubmitting ? "Saving..." : "Save Entry"}
+              </button>
             </form>
           </div>
-
+         
+         {/* saved entries */}
           {entries.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 md:p-8">
+            <div className="bg-[#FCF9EA]  rounded-2xl border border-gray-200 shadow-lg p-6 md:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    Recent Entries
-                  </h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Recent Entries</h3>
                   <p className="text-gray-500 mt-2">Your latest reflections</p>
                 </div>
-                <span className="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-full text-sm font-medium text-gray-700">
+                <span className="px-4 py-2 bg-gray-50 rounded-full text-sm font-medium text-gray-700">
                   {entries.length} total entries
                 </span>
               </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {entries.slice(0, 4).map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="group relative overflow-hidden bg-gradient-to-br from-gray-50/50 to-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-gray-900">
-                            {formatDate(entry.date)}
-                          </span>
-                          <span className="hidden sm:inline text-gray-400">
-                            •
-                          </span>
-                          {entry.timestamp && (
-                            <span className="text-sm text-gray-500 font-medium">
-                              {formatTime(entry.timestamp)}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-sm px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full text-gray-700 font-medium">
+                  <div key={entry.id} className="group relative bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all duration-300">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex flex-col">
+                        <span className="text-lg font-bold text-gray-900">{formatDate(entry.date)}</span>
+                        <span className="text-xs text-gray-400">{formatTime(entry.timestamp)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded-md text-gray-600 font-medium">
                           {entry.name}
                         </span>
-                      </div>
-                      <p className="text-gray-700 leading-relaxed line-clamp-4">
-                        {entry.text}
-                      </p>
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <span className="text-sm text-gray-400">
-                          {entry.text.length > 300
-                            ? "Detailed reflection"
-                            : "Quick note"}
-                        </span>
+                        <button 
+                          onClick={() => handleDelete(entry.id)}
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
+                    <p className="text-gray-700 text-sm leading-relaxed line-clamp-4">{entry.text}</p>
                   </div>
                 ))}
               </div>
-
-              {entries.length > 4 && (
-                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-                  <p className="text-gray-500">
-                    And {entries.length - 4} more entries in your journal
-                  </p>
-                </div>
-              )}
             </div>
           )}
-        </div>
-
-        <div className="lg:col-span-1">
-          <div className="sticky top-8">
-           {/* calendar */}
-          </div>
         </div>
       </div>
     </div>

@@ -17,7 +17,7 @@ function App() {
   return (
     <>
       <Header name="DailyDraft" />
-      <div className="flex gap-6 p-21 bg-gray-50 min-h-screen">
+      <div className="flex gap-6 p-21 bg-[#90AB8B] min-h-screen">
         {/* Left side - Diary Entry */}
         <section className="flex-1">
           <DiaryEntryInput 
