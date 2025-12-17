@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Save, Calendar, User, Clock, Trash2 } from "lucide-react";
 
-function DiaryEntryInput({ onEntrySaved }) {
+function DiaryEntryInput({ selectedDate, onEntrySaved }) {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [text, setText] = useState("");
@@ -22,7 +22,7 @@ function DiaryEntryInput({ onEntrySaved }) {
       const existingEntries = getEntriesFromStorage();
       const updatedEntries = [entry, ...existingEntries];
       localStorage.setItem("diaryEntries", JSON.stringify(updatedEntries));
-      return { success: true };
+      return { success: true, entries: updatedEntries };
     } catch (error) {
       return { success: false, message: "Failed to save entry" };
     }
@@ -51,9 +51,9 @@ function DiaryEntryInput({ onEntrySaved }) {
 
   useEffect(() => {
     setEntries(getEntriesFromStorage());
-    const today = new Date().toISOString().split("T")[0];
-    setDate(today);
-  }, []);
+    const initialDate = selectedDate || new Date().toISOString().split("T")[0];
+    setDate(initialDate);
+  }, [selectedDate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,9 +78,9 @@ function DiaryEntryInput({ onEntrySaved }) {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     if (result.success) {
-      setEntries(getEntriesFromStorage());
+      setEntries(result.entries || getEntriesFromStorage());
       setName("");
-      setDate(new Date().toISOString().split("T")[0]);
+      setDate(selectedDate || new Date().toISOString().split("T")[0]);
       setText("");
       setIsSubmitting(false);
 
@@ -109,138 +109,146 @@ function DiaryEntryInput({ onEntrySaved }) {
 
   const getCharCountColor = () => {
     if (text.length === 0) return "from-gray-400 to-gray-400";
-    if (text.length < 100) return "from-blue-400 to-indigo-400";
-    if (text.length < 500) return "from-indigo-400 to-purple-400";
-    if (text.length < 1000) return "from-purple-400 to-pink-400";
-    return "from-pink-400 to-rose-400";
+    if (text.length < 500) return "from-[#90AB8B] to-[#7A9376]";
+    return "from-[#7A9376] to-[#5F745D]";
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-12">
+      <div className="text-center">
+        <h1 className="text-3xl md:text-5xl font-['Playfair_Display'] font-bold text-[#5F745D] mb-4">
           Daily Draft
         </h1>
       </div>
-      {/* main input container */}
-      <div className="flex justify-center">
-        <div className="lg:col-span-2 space-y-8 w-full max-w-4xl">
-          <div className="bg-[#FCF9EA] rounded-2xl border border-gray-200 shadow-lg p-6 md:p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">New Entry</h2>
-                <p className="text-gray-500 mt-2">Today's thoughts...</p>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-full">
-                <Clock size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-600 font-medium">
-                  {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                </span>
-              </div>
+
+    {/* main input */}
+      <div className="bg-[#FCF9EA] rounded-[3rem] p-6 md:p-10 shadow-xl border border-[#E5E1CC]">
+        <div className="relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-[#5F745D]">New Entry</h2>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 text-sm font-semibold text-gray-700">
-                    <Calendar size={18} className="text-indigo-500" />
-                    Entry Date
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    max={new Date().toISOString().split("T")[0]}
-                    className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white"
-                    required
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 text-sm font-semibold text-gray-700">
-                    <User size={18} className="text-indigo-500" />
-                    Author Name
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your name"
-                    maxLength={50}
-                    className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700">Today's Thoughts</label>
-                <div className="relative">
-                  <textarea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    rows={12}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-3 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all duration-300 bg-white resize-none leading-relaxed"
-                    required
-                  />
-                  <div className="absolute bottom-4 right-4">
-                    <div className={`text-sm font-semibold bg-gradient-to-r ${getCharCountColor()} bg-clip-text text-transparent`}>
-                      {text.length}/2000
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* submit button */}
-              <button
-                type="submit"
-                disabled={!date || !name.trim() || !text.trim() || isSubmitting}
-                className="w-full bg-[#B8DB80] text-white py-4 px-4 rounded-xl font-semibold hover:shadow-xl disabled:from-gray-300 transition-all duration-300"
-              >
-                {isSubmitting ? "Saving..." : "Save Entry"}
-              </button>
-            </form>
+            <div className="flex items-center gap-2 px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC]">
+              <Clock size={16} className="text-[#90AB8B]" />
+              <span className="text-sm text-[#5F745D] font-bold">
+                {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </div>
           </div>
-         
-         {/* saved entries */}
-          {entries.length > 0 && (
-            <div className="bg-[#FCF9EA]  rounded-2xl border border-gray-200 shadow-lg p-6 md:p-8">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Recent Entries</h3>
-                  <p className="text-gray-500 mt-2">Your latest reflections</p>
-                </div>
-                <span className="px-4 py-2 bg-gray-50 rounded-full text-sm font-medium text-gray-700">
-                  {entries.length} total entries
-                </span>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 text-sm font-bold text-[#5F745D] uppercase tracking-wider">
+                  <Calendar size={18} className="text-[#90AB8B]" />
+                  Entry Date
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  max={new Date().toISOString().split("T")[0]}
+                  className="w-full px-4 py-3.5 border border-[#E5E1CC] rounded-2xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white"
+                  required
+                />
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {entries.slice(0, 4).map((entry) => (
-                  <div key={entry.id} className="group relative bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all duration-300">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex flex-col">
-                        <span className="text-lg font-bold text-gray-900">{formatDate(entry.date)}</span>
-                        <span className="text-xs text-gray-400">{formatTime(entry.timestamp)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded-md text-gray-600 font-medium">
-                          {entry.name}
-                        </span>
-                        <button 
-                          onClick={() => handleDelete(entry.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-gray-700 text-sm leading-relaxed line-clamp-4">{entry.text}</p>
-                  </div>
-                ))}
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 text-sm font-bold text-[#5F745D] uppercase tracking-wider">
+                  <User size={18} className="text-[#90AB8B]" />
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your Name"
+                  className="w-full px-4 py-3.5 border border-[#E5E1CC] rounded-2xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white"
+                  required
+                />
               </div>
             </div>
-          )}
+
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-[#5F745D] uppercase tracking-wider">Journal Content</label>
+              <div className="relative">
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  rows={10}
+                  placeholder="Start writing..."
+                  className="w-full px-5 py-5 border border-[#E5E1CC] rounded-3xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white resize-none leading-relaxed"
+                  required
+                />
+                <div className="absolute bottom-4 right-6">
+                  <div className={`text-xs font-bold bg-gradient-to-r ${getCharCountColor()} bg-clip-text text-transparent`}>
+                    {text.length}/2000
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={isSubmitting || !text}
+              className="w-full bg-gradient-to-r from-[#90AB8B] to-[#7A9376] text-white py-5 rounded-full font-bold uppercase tracking-[0.2em] shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Saving...
+                </span>
+              ) : (
+                "Save Journal Entry"
+              )}
+            </button>
+          </form>
         </div>
       </div>
+
+      {/* saved entries */}
+      {entries.length > 0 && (
+        <div className="bg-gradient-to-br from-[#FCF9EA] to-[#F8F5E6] rounded-[3rem] p-6 md:p-10 shadow-xl border border-[#E5E1CC]">
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+              <div>
+                <h3 className="text-2xl font-bold text-[#5F745D]">Recent Entries</h3>
+                <p className="text-[#90AB8B] font-medium mt-1">Your journey so far</p>
+              </div>
+              <span className="px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC] text-xs font-bold text-[#5F745D] uppercase tracking-widest">
+                {entries.length} Total
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {entries.slice(0, 4).map((entry) => (
+                <div key={entry.id} className="group relative bg-white border border-[#E5E1CC] rounded-[2rem] p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex flex-col">
+                      <span className="text-lg font-bold text-[#5F745D]">{formatDate(entry.date)}</span>
+                      <span className="text-[10px] font-bold text-[#90AB8B] uppercase tracking-tighter">{formatTime(entry.timestamp)}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] px-3 py-1 bg-gradient-to-r from-[#90AB8B] to-[#7A9376] rounded-full text-white font-bold uppercase tracking-widest">
+                        {entry.name}
+                      </span>
+                      <button 
+                        onClick={() => handleDelete(entry.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                        aria-label="Delete entry"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[#5F745D]/90 text-sm leading-relaxed line-clamp-4 font-medium italic">
+                    "{entry.text}"
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
