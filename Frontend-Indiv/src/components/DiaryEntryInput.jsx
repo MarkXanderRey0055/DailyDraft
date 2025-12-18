@@ -114,21 +114,21 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-12">
-      <div className="text-center">
-        <h1 className="text-3xl md:text-5xl font-['Playfair_Display'] font-bold text-[#5F745D] mb-4">
+    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-8 lg:space-y-12">
+      <div className="text-center mb-4 lg:mb-6">
+        <h1 className="text-2xl md:text-4xl lg:text-5xl font-['Playfair_Display'] font-bold text-[#5F745D] mb-3 lg:mb-4">
           Daily Draft
         </h1>
       </div>
 
-    {/* main input */}
-      <div className="bg-[#FCF9EA] rounded-[3rem] p-6 md:p-10 shadow-xl border border-[#E5E1CC]">
+      {/* main input */}
+      <div className="bg-[#FCF9EA] rounded-[2rem] lg:rounded-[3rem] p-4 md:p-6 lg:p-8 xl:p-10 shadow-xl border border-[#E5E1CC]">
         <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 lg:mb-8 gap-3">
             <div>
-              <h2 className="text-2xl font-bold text-[#5F745D]">New Entry</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-[#5F745D]">New Entry</h2>
             </div>
-            <div className="flex items-center gap-2 px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC]">
+            <div className="flex items-center gap-2 px-4 md:px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC]">
               <Clock size={16} className="text-[#90AB8B]" />
               <span className="text-sm text-[#5F745D] font-bold">
                 {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
@@ -136,8 +136,8 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-6 lg:space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               <div className="space-y-3">
                 <label className="flex items-center gap-3 text-sm font-bold text-[#5F745D] uppercase tracking-wider">
                   <Calendar size={18} className="text-[#90AB8B]" />
@@ -148,7 +148,7 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   max={new Date().toISOString().split("T")[0]}
-                  className="w-full px-4 py-3.5 border border-[#E5E1CC] rounded-2xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white"
+                  className="w-full px-4 py-3 md:py-3.5 border border-[#E5E1CC] rounded-2xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white"
                   required
                 />
               </div>
@@ -162,7 +162,7 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full px-4 py-3.5 border border-[#E5E1CC] rounded-2xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white"
+                  className="w-full px-4 py-3 md:py-3.5 border border-[#E5E1CC] rounded-2xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white"
                   required
                 />
               </div>
@@ -176,7 +176,7 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
                   onChange={(e) => setText(e.target.value)}
                   rows={10}
                   placeholder="Start writing..."
-                  className="w-full px-5 py-5 border border-[#E5E1CC] rounded-3xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white resize-none leading-relaxed"
+                  className="w-full px-4 md:px-5 py-4 md:py-5 border border-[#E5E1CC] rounded-3xl focus:ring-2 focus:ring-[#90AB8B]/20 focus:border-[#90AB8B] transition-all duration-300 bg-white resize-none leading-relaxed"
                   required
                 />
                 <div className="absolute bottom-4 right-6">
@@ -190,7 +190,7 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
             <button 
               type="submit" 
               disabled={isSubmitting || !text}
-              className="w-full bg-gradient-to-r from-[#90AB8B] to-[#7A9376] text-white py-5 rounded-full font-bold uppercase tracking-[0.2em] shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#90AB8B] to-[#7A9376] text-white py-4 md:py-5 rounded-full font-bold uppercase tracking-[0.2em] shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
@@ -207,21 +207,21 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
 
       {/* saved entries */}
       {entries.length > 0 && (
-        <div className="bg-gradient-to-br from-[#FCF9EA] to-[#F8F5E6] rounded-[3rem] p-6 md:p-10 shadow-xl border border-[#E5E1CC]">
+        <div className="bg-gradient-to-br from-[#FCF9EA] to-[#F8F5E6] rounded-[2rem] lg:rounded-[3rem] p-4 md:p-6 lg:p-8 xl:p-10 shadow-xl border border-[#E5E1CC]">
           <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 lg:mb-8 gap-3">
               <div>
-                <h3 className="text-2xl font-bold text-[#5F745D]">Recent Entries</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-[#5F745D]">Recent Entries</h3>
                 <p className="text-[#90AB8B] font-medium mt-1">Your journey so far</p>
               </div>
-              <span className="px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC] text-xs font-bold text-[#5F745D] uppercase tracking-widest">
+              <span className="px-4 md:px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC] text-xs font-bold text-[#5F745D] uppercase tracking-widest">
                 {entries.length} Total
               </span>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
               {entries.slice(0, 4).map((entry) => (
-                <div key={entry.id} className="group relative bg-white border border-[#E5E1CC] rounded-[2rem] p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+                <div key={entry.id} className="group relative bg-white border border-[#E5E1CC] rounded-[2rem] p-4 md:p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex flex-col">
                       <span className="text-lg font-bold text-[#5F745D]">{formatDate(entry.date)}</span>
