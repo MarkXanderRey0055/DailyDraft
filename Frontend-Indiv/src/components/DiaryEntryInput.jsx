@@ -7,6 +7,7 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
   const [text, setText] = useState("");
   const [entries, setEntries] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+   const [currentTime, setCurrentTime] = useState(new Date()); 
 
   const getEntriesFromStorage = () => {
     try {
@@ -54,6 +55,14 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
     const initialDate = selectedDate || new Date().toISOString().split("T")[0];
     setDate(initialDate);
   }, [selectedDate]);
+
+  //update minute
+   useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); 
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,7 +140,7 @@ function DiaryEntryInput({ selectedDate, onEntrySaved }) {
             <div className="flex items-center gap-2 px-4 md:px-5 py-2 bg-white/80 rounded-full border border-[#E5E1CC]">
               <Clock size={16} className="text-[#90AB8B]" />
               <span className="text-sm text-[#5F745D] font-bold">
-                {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                {CurrentTime.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
               </span>
             </div>
           </div>
